@@ -8,6 +8,7 @@ import (
 	"golang.org/x/oauth2"
 
 	oidc "github.com/coreos/go-oidc"
+	spew "github.com/davecgh/go-spew/spew"
 )
 
 type OIDCProvider struct {
@@ -40,6 +41,11 @@ func (p *OIDCProvider) Redeem(redirectURL, code string) (s *SessionState, err er
 	if !ok {
 		return nil, fmt.Errorf("token response did not contain an id_token")
 	}
+	// DEBUG
+	fmt.Println("code\n"+spew.Sdump(code))
+	fmt.Println("token\n"+spew.Sdump(token))
+	fmt.Println("rawIDToken\n"+rawIDToken)
+	// END DEBUG
 
 	// Parse and verify ID Token payload.
 	idToken, err := p.Verifier.Verify(ctx, rawIDToken)
@@ -55,6 +61,17 @@ func (p *OIDCProvider) Redeem(redirectURL, code string) (s *SessionState, err er
 	if err := idToken.Claims(&claims); err != nil {
 		return nil, fmt.Errorf("failed to parse id_token claims: %v", err)
 	}
+
+	// DEBUG: dave
+	var tmpClaims map[string]interface{}
+	if err := idToken.Claims(&tmpClaims); err != nil {
+		return nil, fmt.Errorf("failed to parse all claims: %v", err)
+	}
+	fmt.Println("OIDC Provider\n"+spew.Sdump(p))
+	fmt.Println("Oauth2 Config\n"+spew.Sdump(c))
+	fmt.Println("ID Token\n"+spew.Sdump(idToken))
+	fmt.Println("claims\n"+spew.Sdump(tmpClaims))
+	// END DEBUG
 
 	if claims.Email == "" {
 		return nil, fmt.Errorf("id_token did not contain an email")

@@ -87,6 +87,7 @@ func (p *ProviderData) GetLoginURL(redirectURI, state string) string {
 	params.Add("scope", p.Scope)
 	params.Set("client_id", p.ClientID)
 	params.Set("response_type", "code")
+//	params.Set("response_type", "code token id_token")
 	params.Add("state", state)
 	a.RawQuery = params.Encode()
 	return a.String()
